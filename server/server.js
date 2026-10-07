@@ -262,3 +262,56 @@ app.delete('/api/expenses/:id', requireAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// PUT route to update income
+app.put('/api/income/:id', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { source, amount, date } = req.body;
+    const userId = req.user.userId;
+
+    if (!source || !amount || !date) {
+      return res.status(400).json({ error: 'Source, amount, and date are required' });
+    }
+
+    const pool = await sql.connect(dbConfig);
+    const result = await pool.request()
+      .input('id', sql.Int, id)
+      .input('user_id', sql.Int, userId)
+      .input('source', sql.NVarChar, source)
+      .input('amount', sql.Decimal(10, 2), amount)
+      .input('date', sql.Date, date)
+      .query(`UPDATE income
+              SET source = @source, amount = @amount, date = @date
+              WHERE id = @id AND user_id = @user_id`);
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(404).json({ error: 'Income not found' });
+    }
+
+    res.json({ message: 'Income updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE route to remove income
+app.delete('/api/income/:id', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const pool = await sql.connect(dbConfig);
+    const result = await pool.request()
+      .input('id', sql.Int, id)
+      .input('user_id', sql.Int, userId)
+      .query('DELETE FROM income WHERE id = @id AND user_id = @user_id');
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(404).json({ error: 'Income not found' });
+    }
+
+    res.json({ message: 'Income deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
