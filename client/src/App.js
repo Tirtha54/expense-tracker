@@ -1,24 +1,49 @@
-import logo from './logo.svg';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Sidebar from './components/Sidebar';
+import Dashboard from './pages/Dashboard';
+import AddExpense from './pages/AddExpense';
+import ViewExpenses from './pages/ViewExpenses';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import './App.css';
+import AddIncome from './pages/AddIncome';
+import ViewIncome from './pages/ViewIncome';
+
+function ProtectedLayout() {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <div className="app-shell">
+      <Sidebar />
+      <div className="main-content">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/add-expense" element={<div className="page-content"><AddExpense /></div>} />
+          <Route path="/income" element={<div className="page-content"><ViewIncome /></div>} />
+         <Route path="/add-income" element={<div className="page-content"><AddIncome /></div>} />
+          <Route path="/expenses" element={<div className="page-content"><ViewExpenses /></div>} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/*" element={<ProtectedLayout />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
