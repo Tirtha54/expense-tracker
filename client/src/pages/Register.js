@@ -28,7 +28,7 @@ function Register() {
         return;
       }
 
-      // Auto-login right after successful registration
+      
       const loginResponse = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

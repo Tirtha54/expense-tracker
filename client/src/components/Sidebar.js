@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import QuickAdd from './QuickAdd';
 
 function Sidebar() {
     const { logout, user } = useAuth();
@@ -30,12 +31,17 @@ function Sidebar() {
       <NavLink to="/expenses" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
         <span className="sidebar-icon">📋</span> View Expenses
       </NavLink>
+            <NavLink to="/categories" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <span className="sidebar-icon">🏷️</span> Categories
+      </NavLink>
             <div className="sidebar-footer">
         <div className="sidebar-user">👤 {user?.name}</div>
         <button className="sidebar-link logout-btn" onClick={handleLogout}>
           <span className="sidebar-icon">🚪</span> Logout
         </button>
       </div>
+            <QuickAdd />
+   
     </aside>
   );
 }

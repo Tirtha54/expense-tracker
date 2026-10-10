@@ -1,7 +1,4 @@
-/* =========================================================
-   Expense Tracker — Light purple theme
-   Replace ALL content of client/src/App.css with this file
-   ========================================================= */
+
 
 :root {
   --bg-page: #F5F5F7;
@@ -31,7 +28,7 @@
   --shadow-card: 0 4px 20px rgba(80, 60, 140, 0.07);
   --shadow-fab: 0 8px 20px rgba(139, 92, 246, 0.45);
 
-  /* legacy aliases so older components keep working */
+  
   --amber: var(--primary);
   --amber-hover: var(--primary-dark);
   --primary-green: var(--primary);
@@ -69,7 +66,7 @@ textarea {
   outline-offset: 2px;
 }
 
-/* ===== App shell + Sidebar ===== */
+
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -179,7 +176,7 @@ textarea {
   cursor: pointer;
 }
 
-/* ===== Dashboard layout ===== */
+
 .dashboard-page {
   max-width: 1100px;
   margin: 40px auto;
@@ -249,7 +246,7 @@ textarea {
   box-shadow: var(--shadow-card);
 }
 
-/* hero balance card — purple gradient */
+
 .big-stat-card.primary {
   background: var(--gradient-hero);
 }
@@ -337,7 +334,7 @@ textarea {
   margin: 0;
 }
 
-/* ===== Expense rows ===== */
+
 .expense-row {
   display: flex;
   align-items: center;
@@ -514,7 +511,7 @@ textarea {
   color: var(--primary-dark);
 }
 
-/* ===== Quick actions ===== */
+
 .quick-actions {
   display: flex;
   flex-direction: column;
@@ -550,7 +547,7 @@ textarea {
   background: var(--primary-dark);
 }
 
-/* ===== Pie legend ===== */
+
 .pie-legend {
   margin-top: 16px;
 }
@@ -585,7 +582,7 @@ textarea {
   font-variant-numeric: tabular-nums;
 }
 
-/* ===== Add Expense / View Expenses / Income pages ===== */
+
 .page-content {
   max-width: 460px;
   margin: 48px auto;
@@ -609,7 +606,7 @@ textarea {
   letter-spacing: -0.01em;
 }
 
-/* "receipt" is now a plain rounded card (no torn edge) */
+
 .receipt {
   background: var(--bg-card);
   border-radius: var(--radius-lg);
@@ -764,7 +761,7 @@ textarea {
   font-variant-numeric: tabular-nums;
 }
 
-/* ===== Auth pages ===== */
+
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -796,11 +793,7 @@ textarea {
   text-decoration: none;
 }
 
-/* =========================================================
-   New building blocks for upcoming features
-   ========================================================= */
 
-/* Floating quick-add "+" button */
 .fab {
   position: fixed;
   right: 28px;
@@ -826,7 +819,7 @@ textarea {
   transform: scale(1.06);
 }
 
-/* Modal (quick add) */
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -847,7 +840,7 @@ textarea {
   box-shadow: 0 20px 50px rgba(31, 27, 46, 0.25);
 }
 
-/* Progress bar (budgets, goals) */
+
 .progress-track {
   height: 8px;
   background: var(--primary-soft);
@@ -865,7 +858,7 @@ textarea {
 .progress-fill.warn { background: var(--warning-color); }
 .progress-fill.over { background: var(--expense-color); }
 
-/* Alert banners (80% / 100% budget) */
+
 .alert-banner {
   display: flex;
   align-items: center;
@@ -887,7 +880,7 @@ textarea {
   color: #BE123C;
 }
 
-/* Payment method / filter pills */
+
 .pill {
   display: inline-block;
   padding: 5px 12px;
@@ -905,7 +898,7 @@ textarea {
   color: #fff;
 }
 
-/* ===== Mobile: sidebar becomes bottom nav ===== */
+
 @media (max-width: 720px) {
   .app-shell {
     flex-direction: column;

@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import './App.css';
 import AddIncome from './pages/AddIncome';
 import ViewIncome from './pages/ViewIncome';
+import Categories from './pages/Categories';
 
 function ProtectedLayout() {
   const { user } = useAuth();
@@ -27,6 +28,7 @@ function ProtectedLayout() {
           <Route path="/income" element={<div className="page-content"><ViewIncome /></div>} />
          <Route path="/add-income" element={<div className="page-content"><AddIncome /></div>} />
           <Route path="/expenses" element={<div className="page-content"><ViewExpenses /></div>} />
+          <Route path="/categories" element={<div className="page-content"><Categories /></div>} />
         </Routes>
       </div>
     </div>

@@ -1,20 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 function AddExpense() {
-    const { token } = useAuth();
+  const { token } = useAuth();
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState([]);
   const [date, setDate] = useState('');
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/categories', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCategories(data);
+          if (data.length > 0) setCategory(data[0].name);
+        }
+      })
+      .catch(() => {});
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-           const response = await fetch('http://localhost:5000/api/expenses', {
+      const response = await fetch('http://localhost:5000/api/expenses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,7 +45,6 @@ function AddExpense() {
         setIsError(false);
         setTitle('');
         setAmount('');
-        setCategory('');
         setDate('');
       } else {
         setMessage('Error: ' + data.error);
@@ -57,7 +71,7 @@ function AddExpense() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Groceries"
+            placeholder="e.g. Swiggy, Groceries"
             required
           />
         </div>
@@ -67,6 +81,8 @@ function AddExpense() {
           <input
             id="amount"
             type="number"
+            step="0.01"
+            min="0.01"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
@@ -76,13 +92,17 @@ function AddExpense() {
 
         <div className="form-group">
           <label>Category</label>
-          <input
-            type="text"
+          <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            placeholder="e.g. Food, Travel, Bills"
             required
-          />
+          >
+            {categories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="form-group">

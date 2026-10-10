@@ -20,12 +20,12 @@ const dbConfig = {
   },
 };
 
-// Test route
+
 app.get('/', (req, res) => {
   res.send('API working');
 });
 
-// Test DB connection route
+
 app.get('/api/db-test', async (req, res) => {
   try {
     await sql.connect(dbConfig);
@@ -37,7 +37,7 @@ app.get('/api/db-test', async (req, res) => {
 });
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-// Middleware: checks if the request has a valid login token
+
 function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
 
@@ -49,14 +49,14 @@ function requireAuth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // attaches { userId, name, email } to the request
-    next(); // token is valid, continue to the actual route
+    req.user = decoded; 
+    next(); 
   } catch (err) {
     return res.status(401).json({ error: 'Invalid or expired token. Please log in again.' });
   }
 }
 
-// POST route to register a new user
+
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -67,7 +67,7 @@ app.post('/api/auth/register', async (req, res) => {
 
     const pool = await sql.connect(dbConfig);
 
-    // Check if email already exists
+    
     const existing = await pool.request()
       .input('email', sql.NVarChar, email)
       .query('SELECT id FROM users WHERE email = @email');
@@ -76,7 +76,7 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(409).json({ error: 'An account with this email already exists' });
     }
 
-    // Hash the password before storing
+    
     const passwordHash = await bcrypt.hash(password, 10);
 
     await pool.request()
@@ -90,7 +90,7 @@ app.post('/api/auth/register', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// POST route to log in a user
+
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -115,7 +115,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Create a token that identifies this user
+    
     const token = jwt.sign(
       { userId: user.id, name: user.name, email: user.email },
       process.env.JWT_SECRET,
@@ -131,7 +131,7 @@ app.post('/api/auth/login', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// POST route to add a new expense
+
 app.post('/api/expenses', requireAuth, async (req, res) => {
   try {
     const { title, amount, category, date } = req.body;
@@ -155,7 +155,7 @@ app.post('/api/expenses', requireAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// POST route to add income
+
 app.post('/api/income', requireAuth, async (req, res) => {
   try {
     const { source, amount, date } = req.body;
@@ -179,7 +179,7 @@ app.post('/api/income', requireAuth, async (req, res) => {
   }
 });
 
-// GET route to fetch all income for the logged-in user
+
 app.get('/api/income', requireAuth, async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -192,7 +192,7 @@ app.get('/api/income', requireAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// GET route to fetch all expenses
+
 app.get('/api/expenses', requireAuth, async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -208,7 +208,7 @@ app.get('/api/expenses', requireAuth, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-// PUT route to update an expense
+
 app.put('/api/expenses/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -241,7 +241,7 @@ app.put('/api/expenses/:id', requireAuth, async (req, res) => {
   }
 });
 
-// DELETE route to remove an expense
+
 app.delete('/api/expenses/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -262,7 +262,7 @@ app.delete('/api/expenses/:id', requireAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// PUT route to update income
+
 app.put('/api/income/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -294,7 +294,7 @@ app.put('/api/income/:id', requireAuth, async (req, res) => {
   }
 });
 
-// DELETE route to remove income
+
 app.delete('/api/income/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -311,6 +311,102 @@ app.delete('/api/income/:id', requireAuth, async (req, res) => {
     }
 
     res.json({ message: 'Income deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const DEFAULT_CATEGORIES = [
+  ['food', '#F59E0B'],
+  ['travel', '#3B82F6'],
+  ['bills', '#F43F5E'],
+  ['fees', '#14B8A6'],
+  ['shopping', '#8B5CF6'],
+  ['entertainment', '#EC4899'],
+];
+
+
+app.get('/api/categories', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const pool = await sql.connect(dbConfig);
+
+    let result = await pool.request()
+      .input('user_id', sql.Int, userId)
+      .query('SELECT id, name, color FROM categories WHERE user_id = @user_id ORDER BY id');
+
+    if (result.recordset.length === 0) {
+      for (const [name, color] of DEFAULT_CATEGORIES) {
+        await pool.request()
+          .input('user_id', sql.Int, userId)
+          .input('name', sql.NVarChar, name)
+          .input('color', sql.NVarChar, color)
+          .query('INSERT INTO categories (user_id, name, color) VALUES (@user_id, @name, @color)');
+      }
+      result = await pool.request()
+        .input('user_id', sql.Int, userId)
+        .query('SELECT id, name, color FROM categories WHERE user_id = @user_id ORDER BY id');
+    }
+
+    res.json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+app.post('/api/categories', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const name = (req.body.name || '').trim().toLowerCase();
+    const color = req.body.color || '#8B5CF6';
+
+    if (!name) {
+      return res.status(400).json({ error: 'Category name is required' });
+    }
+    if (name.length > 50) {
+      return res.status(400).json({ error: 'Name must be 50 characters or less' });
+    }
+    if (!/^#[0-9A-Fa-f]{6}$/.test(color)) {
+      return res.status(400).json({ error: 'Invalid color' });
+    }
+
+    const pool = await sql.connect(dbConfig);
+    const existing = await pool.request()
+      .input('user_id', sql.Int, userId)
+      .input('name', sql.NVarChar, name)
+      .query('SELECT id FROM categories WHERE user_id = @user_id AND name = @name');
+
+    if (existing.recordset.length > 0) {
+      return res.status(409).json({ error: 'This category already exists' });
+    }
+
+    await pool.request()
+      .input('user_id', sql.Int, userId)
+      .input('name', sql.NVarChar, name)
+      .input('color', sql.NVarChar, color)
+      .query('INSERT INTO categories (user_id, name, color) VALUES (@user_id, @name, @color)');
+
+    res.status(201).json({ message: 'Category added' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+app.delete('/api/categories/:id', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const pool = await sql.connect(dbConfig);
+    const result = await pool.request()
+      .input('id', sql.Int, req.params.id)
+      .input('user_id', sql.Int, userId)
+      .query('DELETE FROM categories WHERE id = @id AND user_id = @user_id');
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+    res.json({ message: 'Category deleted' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

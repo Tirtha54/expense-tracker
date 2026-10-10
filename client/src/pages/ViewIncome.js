@@ -12,7 +12,7 @@ function ViewIncome() {
 
   useEffect(() => {
     fetchIncome();
-    // eslint-disable-next-line
+    
   }, []);
 
   const fetchIncome = async () => {
